@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5002/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -317,6 +317,14 @@ export const adminAPI = {
       return { success: true, data: response.data };
     } catch (error) {
       return { success: false, error: error.response?.data?.message || 'Failed to load reservations' };
+    }
+  },
+  promoteToAdmin: async (userId) => {
+    try {
+      const response = await api.post(`/admin/promote/${userId}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.message || 'Failed to promote user' };
     }
   }
 };

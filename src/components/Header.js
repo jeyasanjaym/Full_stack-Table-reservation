@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Calendar, LogOut } from 'lucide-react';
+import { User, Calendar, LogOut, MessageCircle } from 'lucide-react';
 import './Header.css';
+import ChatbotModal from './ChatbotModal';
 
 const Header = ({ user, onLogout }) => {
   const navigate = useNavigate();
+  const [chatOpen, setChatOpen] = useState(false);
 
   const handleLogout = () => {
     onLogout();
     navigate('/');
   };
+
+  const openChat = () => setChatOpen(true);
+  const closeChat = () => setChatOpen(false);
 
   return (
     <header className="header">
@@ -23,6 +28,9 @@ const Header = ({ user, onLogout }) => {
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/restaurants" className="nav-link">Restaurants</Link>
           <Link to="/find" className="nav-link">Find Restaurant</Link>
+          <button type="button" onClick={openChat} className="nav-link" style={{border:'none', background:'transparent', cursor:'pointer', display:'flex', alignItems:'center', gap:6}}>
+            <MessageCircle size={16} /> Chat
+          </button>
           {user && <Link to="/my-reservations" className="nav-link">My Reservations</Link>}
         </nav>
 
@@ -46,6 +54,7 @@ const Header = ({ user, onLogout }) => {
           )}
         </div>
       </div>
+      <ChatbotModal open={chatOpen} onClose={closeChat} />
     </header>
   );
 };

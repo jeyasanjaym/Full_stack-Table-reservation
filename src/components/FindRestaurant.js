@@ -40,6 +40,20 @@ const FindRestaurant = () => {
     }
   }, []);
 
+  const districts = useMemo(() => Array.from(new Set(hotels.map(h => (h.district || h.city || '').trim()).filter(Boolean))), [hotels]);
+
+  const filtered = useMemo(() => {
+    let list = hotels;
+    const norm = (v) => (v || '').toString().trim().toLowerCase();
+    const d = norm(district);
+    const lt = norm(locationType);
+    const mt = norm(mealType);
+    if (d) list = list.filter(h => norm(h.district) === d || norm(h.city).includes(d));
+    if (lt) list = list.filter(h => norm(h.locationType) === lt);
+    if (mt) list = list.filter(h => norm(h.mealType) === mt || norm(h.mealType) === 'any');
+    return list;
+  }, [hotels, district, locationType, mealType]);
+
   // Update markers when filtered list changes
   useEffect(() => {
     const ref = mapRef.current;
@@ -71,20 +85,6 @@ const FindRestaurant = () => {
       } catch {}
     }
   }, [filtered]);
-
-  const districts = useMemo(() => Array.from(new Set(hotels.map(h => (h.district || h.city || '').trim()).filter(Boolean))), [hotels]);
-
-  const filtered = useMemo(() => {
-    let list = hotels;
-    const norm = (v) => (v || '').toString().trim().toLowerCase();
-    const d = norm(district);
-    const lt = norm(locationType);
-    const mt = norm(mealType);
-    if (d) list = list.filter(h => norm(h.district) === d || norm(h.city).includes(d));
-    if (lt) list = list.filter(h => norm(h.locationType) === lt);
-    if (mt) list = list.filter(h => norm(h.mealType) === mt || norm(h.mealType) === 'any');
-    return list;
-  }, [hotels, district, locationType, mealType]);
 
   const onFind = (e) => {
     e.preventDefault();

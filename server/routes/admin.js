@@ -30,16 +30,28 @@ router.get('/dashboard/summary', auth, requireAdmin, async (req, res) => {
   }
 });
 
-// GET /api/admin/hotels/:id/reservations
-router.get('/hotels/:id/reservations', auth, requireAdmin, async (req, res) => {
+// POST /api/admin/promote/:userId
+router.post('/promote/:userId', auth, requireAdmin, async (req, res) => {
   try {
-    const list = await Reservation.find({ hotel: req.params.id })
-      .populate('user', 'name email')
-      .sort({ createdAt: -1 });
-    res.json({ reservations: list });
+    const { userId } = req.params;
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { role: 'admin' },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: 'User promoted to admin successfully',
+      user: user.toJSON()
+    });
   } catch (err) {
-    console.error('Admin hotel reservations error:', err);
-    res.status(500).json({ message: 'Failed to load hotel reservations' });
+    console.error('Promote user error:', err);
+    res.status(500).json({ message: 'Failed to promote user' });
   }
 });
 

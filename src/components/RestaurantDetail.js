@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import "react-datepicker/dist/react-datepicker.css";
 import './RestaurantDetail.css';
 import { hotelsAPI, reservationsAPI } from '../utils/api';
+import PaymentModal from './PaymentModal';
 
 const RestaurantDetail = ({ user }) => {
   const { id } = useParams();
@@ -17,6 +18,9 @@ const RestaurantDetail = ({ user }) => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState(0);
+  const [pendingPayload, setPendingPayload] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -116,30 +120,48 @@ const RestaurantDetail = ({ user }) => {
       return;
     }
 
-    setBookingLoading(true);
+    // Step 1: open payment modal (dummy)
+    // Simple pricing model: base 100 + 250 per guest
+    const amount = 100 + partySize * 250;
+    const payload = {
+      hotel: restaurant.id,
+      restaurantName: restaurant.name,
+      address: restaurant.address,
+      phone: restaurant.phone,
+      date: selectedDate,
+      time: selectedTime,
+      partySize
+    };
+    setPendingPayload(payload);
+    setPaymentAmount(amount);
+    setIsPaymentOpen(true);
+  };
 
+  const handlePaymentSuccess = async ({ paymentId }) => {
+    setIsPaymentOpen(false);
+    setBookingLoading(true);
     try {
-      const payload = {
-        hotel: restaurant.id, // backend will link if ObjectId
-        restaurantName: restaurant.name,
-        address: restaurant.address,
-        phone: restaurant.phone,
-        date: selectedDate,
-        time: selectedTime,
-        partySize
-      };
-      const res = await reservationsAPI.create(payload);
+      const res = await reservationsAPI.create({
+        ...pendingPayload,
+        paid: true,
+        paymentId
+      });
       if (res.success) {
-        toast.success('Reservation confirmed!');
+        toast.success('Reservation confirmed and payment received!');
         navigate('/my-reservations');
       } else {
-        toast.error(res.error || 'Booking failed');
+        toast.error(res.error || 'Booking failed after payment');
       }
     } catch (error) {
-      toast.error('Booking failed. Please try again.');
+      toast.error('Booking failed after payment. Please contact support.');
     } finally {
       setBookingLoading(false);
+      setPendingPayload(null);
     }
+  };
+
+  const handlePaymentError = (error) => {
+    toast.error(error?.message || 'Payment failed. Please try again.');
   };
 
   if (loading) {
@@ -186,7 +208,6 @@ const RestaurantDetail = ({ user }) => {
           </div>
         </div>
       </div>
-
       <div className="container">
         <div className="restaurant-content">
           <div className="restaurant-info">
@@ -307,8 +328,14 @@ const RestaurantDetail = ({ user }) => {
           </div>
         </div>
       </div>
+      <PaymentModal
+        open={isPaymentOpen}
+        amount={paymentAmount}
+        onClose={() => setIsPaymentOpen(false)}
+        onSuccess={handlePaymentSuccess}
+        onError={handlePaymentError}
+      />
     </div>
   );
 };
-
 export default RestaurantDetail;
