@@ -1,0 +1,107 @@
+.payment-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.payment-modal {
+  width: 95%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  overflow: hidden;
+  animation: scaleIn .15s ease-out;
+}
+
+@keyframes scaleIn { from { transform: scale(.98); opacity:.8 } to { transform: scale(1); opacity:1 } }
+
+.payment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.payment-header h3 { margin: 0; color: #111827; }
+
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.payment-body { padding: 1rem 1.25rem; }
+
+.amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: .75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 0.75rem;
+}
+
+.form-group { display: flex; flex-direction: column; gap: .35rem; }
+.form-group.full { grid-column: span 2; }
+.form-group label { font-size: .9rem; color: #374151; font-weight: 600; }
+.form-group input {
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: .7rem .9rem;
+  font-size: 1rem;
+}
+.form-group input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,.12); }
+
+.secure-note { color: #6b7280; font-size: .85rem; margin-top: .5rem; }
+
+.payment-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: .75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.payment-footer .secondary {
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: .7rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.payment-footer .primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: .7rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.payment-footer .primary.loading { opacity: .8; cursor: not-allowed; }
+
+@media (max-width: 480px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: span 1; }
+}
